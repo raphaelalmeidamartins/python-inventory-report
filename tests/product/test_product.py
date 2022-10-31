@@ -2,7 +2,7 @@ from inventory_report.inventory.product import Product
 
 
 def test_cria_produto():
-    mock_product = {
+    mock = {
         "id": 1,
         "nome_da_empresa": "Elma Chips",
         "nome_do_produto": "Batata Frita Ondulada Original Ruffles 76g",
@@ -12,7 +12,7 @@ def test_cria_produto():
         "instrucoes_de_armazenamento": "Guarde em local arejado.",
     }
 
-    produto = Product(**mock_product)
+    product = Product(**mock)
 
-    for key, value in mock_product.items():
-        assert getattr(produto, key) == value
+    for key, value in mock.items():
+        assert getattr(product, key) == value
