@@ -1,51 +1,39 @@
-import csv
-import json
-
-import xmltodict
-
+from inventory_report.importer.csv_importer import CsvImporter
+from inventory_report.importer.json_importer import JsonImporter
+from inventory_report.importer.xml_importer import XmlImporter
 from inventory_report.reports.complete_report import CompleteReport
 from inventory_report.reports.simple_report import SimpleReport
 
 
 class Inventory:
+    __read_strategies = {
+        "csv": CsvImporter.import_data,
+        "json": JsonImporter.import_data,
+        "xml": XmlImporter.import_data,
+    }
+
+    __report_strategies = {
+        "simples": SimpleReport,
+        "completo": CompleteReport,
+    }
+
     @classmethod
     def import_data(cls, file_path, report_type):
-        with open(file_path, encoding="utf-8") as file:
-            file_extension = file_path.split(".")[-1]
+        file_extension = file_path.split(".")[-1]
 
-            if file_extension not in ["csv", "json", "xml"]:
-                raise ValueError("Invalid file extension")
+        valid_extensions = list(cls.__read_strategies.keys())
 
-            read_methods = {
-                "csv": cls.__read_csv,
-                "json": cls.__read_json,
-                "xml": cls.__read_xml,
-            }
+        if file_extension not in valid_extensions:
+            raise ValueError("Arquivo inválido")
 
-            docs_list = read_methods[file_extension](file)
+        docs_list = cls.__read_strategies[file_extension](file_path)
 
-        if report_type == "simples":
-            return SimpleReport.generate(docs_list)
+        report_types = list(cls.__report_strategies.keys())
 
-        if report_type == "completo":
-            return CompleteReport.generate(docs_list)
+        if report_type not in report_types:
+            raise ValueError(
+                f"Invalid report type, "
+                f"it needs to be one of the following {report_types}"
+            )
 
-        raise ValueError(
-            "Invalid report type, it needs to be 'simples' or 'completo'"
-        )
-
-    @classmethod
-    def __read_csv(cls, file):
-        reader = csv.DictReader(file, delimiter=",", quotechar='"')
-        docs_list = list(reader)
-        return docs_list
-
-    @classmethod
-    def __read_json(cls, file):
-        docs_list = json.load(file)
-        return docs_list
-
-    @classmethod
-    def __read_xml(cls, file):
-        docs_list = xmltodict.parse(file.read())["dataset"]["record"]
-        return docs_list
+        return cls.__report_strategies[report_type].generate(docs_list)
