@@ -4,7 +4,7 @@ import datetime
 
 class SimpleReport:
     @classmethod
-    def generate(cls, products: list[dict]):
+    def generate(cls, products):
         man_dates = [
             cls.__generate_date_object(product["data_de_fabricacao"])
             for product in products
@@ -25,7 +25,7 @@ class SimpleReport:
         )
 
     @classmethod
-    def __generate_date_object(cls, date_string: str):
+    def __generate_date_object(cls, date_string):
         return datetime.datetime(
             year=int(date_string[0:4]),
             month=int(date_string[5:7]),

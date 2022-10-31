@@ -6,7 +6,7 @@ from inventory_report.reports.simple_report import SimpleReport
 
 class Inventory:
     @classmethod
-    def import_data(cls, file_path: str, report_type: str):
+    def import_data(cls, file_path, report_type):
         with open(file_path, encoding="utf-8") as file:
             reader = csv.DictReader(file, delimiter=",", quotechar='"')
             docs_list = list(reader)
